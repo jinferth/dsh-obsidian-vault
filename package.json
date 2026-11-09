@@ -1,0 +1,49 @@
+{
+  "name": "dsh-obsidian-vault",
+  "version": "1.0.0",
+  "description": "Obsidian vault tools for DeepSeek Harness: list, read, search, create and edit Markdown notes, manage YAML frontmatter, query by tag, and repair wikilinks when notes move.",
+  "type": "module",
+  "license": "MIT",
+  "author": "jinferth",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node test/smoke.mjs"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "obsidian",
+    "markdown",
+    "notes",
+    "knowledge-base",
+    "wikilinks"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jinferth/dsh-obsidian-vault.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jinferth/dsh-obsidian-vault/issues"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

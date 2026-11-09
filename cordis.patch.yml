@@ -1,0 +1,15 @@
+# Mounts the Obsidian vault tools into the current profile.
+#
+# The vault is discovered automatically, in this order:
+#   1. a `vaultPath` you set below
+#   2. the OBSIDIAN_VAULT environment variable
+#   3. the vault Obsidian itself last opened (read from its obsidian.json)
+#
+# Nothing machine-specific ships here on purpose: uncomment and edit `config`
+# only when you want to pin one vault.
+- insert:
+    - id: obsidian-vault
+      name: dsh-obsidian-vault
+      # config:
+      #   vaultPath: 'C:\Users\me\Documents\Obsidian'
+      #   maxResults: 200

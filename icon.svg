@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Obsidian vault">
+  <defs>
+    <linearGradient id="ob" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9b6dff"/>
+      <stop offset="1" stop-color="#5b2fd6"/>
+    </linearGradient>
+  </defs>
+  <path d="M32 4 54 18v28L32 60 10 46V18z" fill="url(#ob)" opacity="0.16"/>
+  <path d="M32 8 50 19.5v25L32 56 14 44.5v-25z" fill="none" stroke="url(#ob)" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M32 20l8 8-8 16-8-16z" fill="url(#ob)"/>
+  <path d="M32 20v24" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.55"/>
+</svg>

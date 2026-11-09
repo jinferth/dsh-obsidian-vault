@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Obsidian Vault",
+    "description": "Gives the agent read and write access to an Obsidian vault: list, read, search, create, and append notes."
+  }
+}
