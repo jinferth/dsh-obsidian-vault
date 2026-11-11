@@ -10,15 +10,17 @@ is required.
 
 ## Install
 
-```sh
-dsh plugin --profile web add dsh-obsidian-vault
-```
-
-Or straight from GitHub:
+Install from this repository:
 
 ```sh
 dsh plugin --profile web add github:jinferth/dsh-obsidian-vault
 ```
+
+> **Install by GitHub path, not by bare package name.** This plugin is not
+> published to npm, and the unscoped name `dsh-obsidian-vault` is already taken
+> there by an unrelated plugin by another author. `dsh plugin add
+> dsh-obsidian-vault` would resolve to that npm package and install something
+> else. Use the `github:` form above, or a tarball from a release.
 
 Restart the profile, then confirm the tools loaded:
 
@@ -120,6 +122,14 @@ frontmatter、按标签查询；重命名笔记时自动改写全库双链；删
 写入是原子的，保留 CRLF 与 BOM。插件不导入任何 `@deepseek-ai/*` 包，只调用
 `ctx.tools.register`，因此 Harness 升级不会因依赖版本范围把插件打挂；即使宿主
 接口变动，也只是日志里出现一行提示，不会让 profile 起不来。
+
+安装请用 GitHub 路径：
+
+```sh
+dsh plugin --profile web add github:jinferth/dsh-obsidian-vault
+```
+
+不要用裸包名 `dsh-obsidian-vault`——npm 上那个同名包属于另一位作者，是无关的插件。
 
 装好后如果提示未配置库：在 Obsidian 里打开一次库，或设置 `OBSIDIAN_VAULT`，
 或在 `cordis.patch.yml` 里写 `config.vaultPath`。
