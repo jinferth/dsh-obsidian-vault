@@ -16,11 +16,11 @@ Install from this repository:
 dsh plugin --profile web add github:jinferth/dsh-obsidian-vault
 ```
 
-> **Install by GitHub path, not by bare package name.** This plugin is not
-> published to npm, and the unscoped name `dsh-obsidian-vault` is already taken
-> there by an unrelated plugin by another author. `dsh plugin add
-> dsh-obsidian-vault` would resolve to that npm package and install something
-> else. Use the `github:` form above, or a tarball from a release.
+> **Install by GitHub path.** The package is named `@jinferth/dsh-obsidian-vault`
+> and is not published to npm, while the unscoped name `dsh-obsidian-vault` is
+> already taken there by an unrelated plugin by another author. Installing by the
+> bare name would fetch that project instead. Use the `github:` form above, or a
+> tarball from a release.
 
 Restart the profile, then confirm the tools loaded:
 
@@ -44,7 +44,7 @@ To pin one vault, add a config block:
 ```yaml
 - insert:
     - id: obsidian-vault
-      name: dsh-obsidian-vault
+      name: '@jinferth/dsh-obsidian-vault'
       config:
         vaultPath: '/home/me/Obsidian'
         maxResults: 200
@@ -130,6 +130,7 @@ dsh plugin --profile web add github:jinferth/dsh-obsidian-vault
 ```
 
 不要用裸包名 `dsh-obsidian-vault`——npm 上那个同名包属于另一位作者，是无关的插件。
+本包的包名是 `@jinferth/dsh-obsidian-vault`，尚未发布到 npm。
 
 装好后如果提示未配置库：在 Obsidian 里打开一次库，或设置 `OBSIDIAN_VAULT`，
 或在 `cordis.patch.yml` 里写 `config.vaultPath`。

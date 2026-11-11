@@ -9,7 +9,7 @@
 # only when you want to pin one vault.
 - insert:
     - id: obsidian-vault
-      name: dsh-obsidian-vault
+      name: '@jinferth/dsh-obsidian-vault'
       # config:
       #   vaultPath: 'C:\Users\me\Documents\Obsidian'
       #   maxResults: 200

@@ -221,13 +221,13 @@ async function main() {
     const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'))
     await check('package.json declares dsh.bundle.patch', () => {
       assert.equal(pkg.dsh?.bundle?.patch, './cordis.patch.yml')
-      assert.equal(pkg.name, 'dsh-obsidian-vault')
+      assert.equal(pkg.name, '@jinferth/dsh-obsidian-vault')
       assert.equal(pkg.private, undefined, 'a private package cannot be installed as a bundle')
     })
     await check('the patch file inserts this package', async () => {
       const patch = await readFile(new URL('../cordis.patch.yml', import.meta.url), 'utf8')
       assert.match(patch, /-\s*insert:/, 'patch must be an insert list')
-      assert.match(patch, new RegExp(`name:\\s*${pkg.name}`), 'patch must name this package')
+      assert.ok(patch.includes(pkg.name), 'patch must name this package')
     })
     await check('index exports the plugin contract', async () => {
       const mod = await import('../index.js')
