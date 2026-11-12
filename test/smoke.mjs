@@ -65,6 +65,26 @@ async function main() {
         assert.equal(typeof tool.execute, 'function', `${name} has no execute`)
       }
     })
+    await check('every tool declares a JSON Schema object', () => {
+      // Upstream providers validate this strictly: a shorthand `{ path: {...} }`
+      // is rejected with HTTP 400 "tool parameter structure does not match the
+      // model" when traffic goes through a reverse proxy. Keep the wire shape real.
+      for (const [name, tool] of tools) {
+        const schema = tool.parameters
+        assert.ok(schema && typeof schema === 'object', `${name}: parameters missing`)
+        assert.equal(schema.type, 'object', `${name}: parameters.type must be 'object'`)
+        assert.equal(typeof schema.properties, 'object', `${name}: properties must be an object`)
+        assert.ok(Array.isArray(schema.required), `${name}: required must be an array`)
+        for (const key of schema.required) {
+          assert.ok(Object.hasOwn(schema.properties, key),
+            `${name}: required '${key}' is not declared in properties`)
+        }
+        for (const [key, prop] of Object.entries(schema.properties)) {
+          assert.ok(prop && typeof prop.type === 'string',
+            `${name}.${key}: property needs a type`)
+        }
+      }
+    })
     await check('obsidian_info is safe without a vault', async () => {
       const result = await tools.get('obsidian_info').execute()
       assert.equal(result.exists, true)

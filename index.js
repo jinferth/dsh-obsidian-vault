@@ -435,7 +435,12 @@ export function apply(ctx, config) {
   register({
     name: 'obsidian_info',
     description: 'Report the configured Obsidian vault: its absolute path, whether it exists, and how many markdown notes it holds. Call this first when you are unsure which vault is connected or whether a path still resolves.',
-    parameters: {},
+    parameters: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {},
+      required: [],
+    },
     output: {
       schema: {
         type: 'object',
@@ -475,9 +480,14 @@ export function apply(ctx, config) {
     name: 'obsidian_list',
     description: 'List markdown notes in the Obsidian vault. Optional `directory` limits the walk to one folder and `glob` filters vault-relative paths (for example "Projects/**" or "*.md"). Returns each note\'s path, title, size, and modification time.',
     parameters: {
-      directory: { type: 'string', description: 'Vault-relative folder to list; omit for the whole vault.' },
-      glob: { type: 'string', description: 'Glob over vault-relative paths, supporting * ? and **.' },
-      limit: { type: 'integer', description: 'Maximum notes to return; defaults to the configured maxResults.' },
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        directory: { type: 'string', description: 'Vault-relative folder to list; omit for the whole vault.' },
+        glob: { type: 'string', description: 'Glob over vault-relative paths, supporting * ? and **.' },
+        limit: { type: 'integer', description: 'Maximum notes to return; defaults to the configured maxResults.' },
+      },
+      required: [],
     },
     output: {
       schema: {
@@ -543,7 +553,12 @@ export function apply(ctx, config) {
     name: 'obsidian_read',
     description: 'Read one note from the Obsidian vault by its vault-relative path. The ".md" extension may be omitted. Returns the full raw markdown, including any frontmatter, plus the wikilinks it contains.',
     parameters: {
-      path: { type: 'string', description: 'Vault-relative note path, for example "Projects/Roadmap".' },
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        path: { type: 'string', description: 'Vault-relative note path, for example "Projects/Roadmap".' },
+      },
+      required: ['path'],
     },
     output: {
       schema: {
@@ -583,10 +598,15 @@ export function apply(ctx, config) {
     name: 'obsidian_search',
     description: 'Search note bodies and titles in the Obsidian vault. The query is treated as a literal string unless `regex` is true. Optionally restrict the search with `glob`. Returns one entry per matching line with its note path and line number.',
     parameters: {
-      query: { type: 'string', description: 'Text to search for.' },
-      regex: { type: 'boolean', description: 'Treat the query as a JavaScript regular expression.' },
-      glob: { type: 'string', description: 'Glob over vault-relative paths, supporting * ? and **.' },
-      limit: { type: 'integer', description: 'Maximum matches to return; defaults to the configured maxResults.' },
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        query: { type: 'string', description: 'Text to search for.' },
+        regex: { type: 'boolean', description: 'Treat the query as a JavaScript regular expression.' },
+        glob: { type: 'string', description: 'Glob over vault-relative paths, supporting * ? and **.' },
+        limit: { type: 'integer', description: 'Maximum matches to return; defaults to the configured maxResults.' },
+      },
+      required: ['query'],
     },
     output: {
       schema: {
@@ -656,13 +676,18 @@ export function apply(ctx, config) {
     name: 'obsidian_new',
     description: 'Create a new note in the Obsidian vault. Fails if the note already exists, so use this for creation and `obsidian_append` for extending an existing note. Parent folders are created automatically, and optional `frontmatter` pairs become a YAML block.',
     parameters: {
-      path: { type: 'string', description: 'Vault-relative note path; ".md" is added when missing.' },
-      content: { type: 'string', description: 'The markdown body of the note.' },
-      frontmatter: {
-        type: 'object',
-        additionalProperties: true,
-        description: 'Optional YAML frontmatter fields, for example {"tags": ["idea"], "status": "draft"}.',
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        path: { type: 'string', description: 'Vault-relative note path; ".md" is added when missing.' },
+        content: { type: 'string', description: 'The markdown body of the note.' },
+        frontmatter: {
+          type: 'object',
+          additionalProperties: true,
+          description: 'Optional YAML frontmatter fields, for example {"tags": ["idea"], "status": "draft"}.',
+        },
       },
+      required: ['path', 'content'],
     },
     output: {
       schema: {
@@ -700,8 +725,13 @@ export function apply(ctx, config) {
     name: 'obsidian_append',
     description: 'Append markdown to the end of an existing note in the Obsidian vault, creating the note when it does not exist yet. A newline is inserted when the note does not already end with one.',
     parameters: {
-      path: { type: 'string', description: 'Vault-relative note path; ".md" is added when missing.' },
-      content: { type: 'string', description: 'Markdown to append.' },
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        path: { type: 'string', description: 'Vault-relative note path; ".md" is added when missing.' },
+        content: { type: 'string', description: 'Markdown to append.' },
+      },
+      required: ['path', 'content'],
     },
     output: {
       schema: {
@@ -752,19 +782,24 @@ export function apply(ctx, config) {
       + '- "deleteLines": delete lines `fromLine`..`toLine` (1-based, inclusive).\n'
       + 'Line numbers are 1-based and match the numbers `obsidian_read` returns. Returns the number of changes and the new line count.',
     parameters: {
-      path: { type: 'string', description: 'Vault-relative note path; ".md" is added when missing.' },
-      action: {
-        type: 'string',
-        description: 'replace (default) | replaceLines | insertLines | deleteLines.',
-        enum: ['replace', 'replaceLines', 'insertLines', 'deleteLines'],
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        path: { type: 'string', description: 'Vault-relative note path; ".md" is added when missing.' },
+        action: {
+          type: 'string',
+          description: 'replace (default) | replaceLines | insertLines | deleteLines.',
+          enum: ['replace', 'replaceLines', 'insertLines', 'deleteLines'],
+        },
+        oldString: { type: 'string', description: 'ACTION=replace: the exact text to replace, including whitespace as it appears in the file.' },
+        newString: { type: 'string', description: 'ACTION=replace: the replacement text. Use an empty string to delete the matched text.' },
+        replaceAll: { type: 'boolean', description: 'ACTION=replace: replace every occurrence instead of requiring exactly one. Defaults to false.' },
+        fromLine: { type: 'integer', description: 'ACTION=replaceLines/deleteLines: first line of the range, 1-based and inclusive.' },
+        toLine: { type: 'integer', description: 'ACTION=replaceLines/deleteLines: last line of the range, 1-based and inclusive.' },
+        atLine: { type: 'integer', description: 'ACTION=insertLines: insert after this line number; 0 inserts at the top.' },
+        content: { type: 'string', description: 'ACTION=replaceLines/insertLines: the replacement or inserted text (may contain newlines).' },
       },
-      oldString: { type: 'string', description: 'ACTION=replace: the exact text to replace, including whitespace as it appears in the file.' },
-      newString: { type: 'string', description: 'ACTION=replace: the replacement text. Use an empty string to delete the matched text.' },
-      replaceAll: { type: 'boolean', description: 'ACTION=replace: replace every occurrence instead of requiring exactly one. Defaults to false.' },
-      fromLine: { type: 'integer', description: 'ACTION=replaceLines/deleteLines: first line of the range, 1-based and inclusive.' },
-      toLine: { type: 'integer', description: 'ACTION=replaceLines/deleteLines: last line of the range, 1-based and inclusive.' },
-      atLine: { type: 'integer', description: 'ACTION=insertLines: insert after this line number; 0 inserts at the top.' },
-      content: { type: 'string', description: 'ACTION=replaceLines/insertLines: the replacement or inserted text (may contain newlines).' },
+      required: ['path'],
     },
     output: {
       schema: {
@@ -876,7 +911,12 @@ export function apply(ctx, config) {
     name: 'obsidian_delete',
     description: 'Delete a note from the Obsidian vault by moving it into the vault\'s `.trash/` folder, so it can still be recovered. The name is kept, with a timestamp suffix when a file already occupies that path. Returns both the original path and the trash path.',
     parameters: {
-      path: { type: 'string', required: true, description: 'Vault-relative note path; ".md" is added when missing.' },
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        path: { type: 'string', required: true, description: 'Vault-relative note path; ".md" is added when missing.' },
+      },
+      required: ['path'],
     },
     output: {
       schema: {
@@ -925,10 +965,15 @@ export function apply(ctx, config) {
     name: 'obsidian_insert_image',
     description: 'Copy an image into the note\'s `assets/` folder and insert a Markdown image reference. The image is renamed to a filesystem-safe name; identical images are reused instead of duplicated. Optionally place the reference right after a given heading (`section`) and add a caption line.',
     parameters: {
-      note: { type: 'string', required: true, description: 'Vault-relative note path that receives the image.' },
-      imagePath: { type: 'string', required: true, description: 'Absolute path of the source image file on this machine.' },
-      caption: { type: 'string', description: 'Optional caption line rendered in italics below the image.' },
-      section: { type: 'string', description: 'Optional heading text (without the # signs); the image is inserted right after that heading\'s section start. Without it the image is appended at the end of the note.' },
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        note: { type: 'string', required: true, description: 'Vault-relative note path that receives the image.' },
+        imagePath: { type: 'string', required: true, description: 'Absolute path of the source image file on this machine.' },
+        caption: { type: 'string', description: 'Optional caption line rendered in italics below the image.' },
+        section: { type: 'string', description: 'Optional heading text (without the # signs); the image is inserted right after that heading\'s section start. Without it the image is appended at the end of the note.' },
+      },
+      required: ['note', 'imagePath'],
     },
     output: {
       schema: {
@@ -1046,10 +1091,15 @@ export function apply(ctx, config) {
     name: 'obsidian_frontmatter',
     description: 'Read or modify the YAML frontmatter of a note without touching the body. Modes: "get" returns all properties; "set" writes one key (creating the block when absent); "delete" removes one key. Values keep their type: strings, numbers, booleans and arrays are serialized correctly.',
     parameters: {
-      path: { type: 'string', required: true, description: 'Vault-relative note path; ".md" is added when missing.' },
-      action: { type: 'string', required: true, description: 'get | set | delete.', enum: ['get', 'set', 'delete'] },
-      key: { type: 'string', description: 'Property name for action=set/delete.' },
-      value: { type: 'json', description: 'Property value for action=set. A JSON scalar or array; arrays become a YAML list.' },
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        path: { type: 'string', required: true, description: 'Vault-relative note path; ".md" is added when missing.' },
+        action: { type: 'string', required: true, description: 'get | set | delete.', enum: ['get', 'set', 'delete'] },
+        key: { type: 'string', description: 'Property name for action=set/delete.' },
+        value: { type: 'json', description: 'Property value for action=set. A JSON scalar or array; arrays become a YAML list.' },
+      },
+      required: ['path', 'action'],
     },
     output: {
       schema: {
@@ -1130,9 +1180,14 @@ export function apply(ctx, config) {
     name: 'obsidian_move',
     description: 'Move or rename a note inside the Obsidian vault and, by default, rewrite every wikilink in the vault that pointed at it. The target must not already exist. Link rewriting covers `[[x]]`, `[[x|alias]]`, `[[x#heading]]`, `[[x#heading|alias]]`, embeds `![[x]]`, both the `.md` and extension-less spellings, and bare file-name links. Returns the new path plus how many notes and links were updated.',
     parameters: {
-      from: { type: 'string', required: true, description: 'Vault-relative path of the note to move; ".md" is added when missing.' },
-      to: { type: 'string', required: true, description: 'Vault-relative destination path; parent folders are created automatically.' },
-      updateLinks: { type: 'boolean', description: 'Rewrite wikilinks across the vault. Defaults to true; set false to move the file only.' },
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        from: { type: 'string', required: true, description: 'Vault-relative path of the note to move; ".md" is added when missing.' },
+        to: { type: 'string', required: true, description: 'Vault-relative destination path; parent folders are created automatically.' },
+        updateLinks: { type: 'boolean', description: 'Rewrite wikilinks across the vault. Defaults to true; set false to move the file only.' },
+      },
+      required: ['from', 'to'],
     },
     output: {
       schema: {
@@ -1216,11 +1271,16 @@ export function apply(ctx, config) {
     name: 'obsidian_query',
     description: 'Find notes by their frontmatter properties, tags and path. `tags` are ANDed (a note must carry all of them); `properties` are exact key/value matches; `glob` filters vault-relative paths. Results can be sorted by modified, created, path or title.',
     parameters: {
-      tags: { type: 'array', items: { type: 'string' }, description: 'Tags that must all be present on the note.' },
-      properties: { type: 'object', additionalProperties: true, description: 'Exact property matches, for example {"status": "done"}.' },
-      glob: { type: 'string', description: 'Glob over vault-relative paths, supporting * ? and **.' },
-      sortBy: { type: 'string', description: 'modified (default) | created | path | title.', enum: ['modified', 'created', 'path', 'title'] },
-      limit: { type: 'integer', description: 'Maximum notes to return; defaults to the configured maxResults.' },
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        tags: { type: 'array', items: { type: 'string' }, description: 'Tags that must all be present on the note.' },
+        properties: { type: 'object', additionalProperties: true, description: 'Exact property matches, for example {"status": "done"}.' },
+        glob: { type: 'string', description: 'Glob over vault-relative paths, supporting * ? and **.' },
+        sortBy: { type: 'string', description: 'modified (default) | created | path | title.', enum: ['modified', 'created', 'path', 'title'] },
+        limit: { type: 'integer', description: 'Maximum notes to return; defaults to the configured maxResults.' },
+      },
+      required: [],
     },
     output: {
       schema: {
@@ -1327,19 +1387,24 @@ export function apply(ctx, config) {
     name: 'obsidian_batch',
     description: 'Apply several note operations as one transaction: every operation runs in order, and if any of them fails the vault is restored to exactly its previous state. Allowed operations are obsidian_edit, obsidian_append, obsidian_new, obsidian_delete, obsidian_move and obsidian_frontmatter. Nesting obsidian_batch is rejected.',
     parameters: {
-      operations: {
-        type: 'array',
-        required: true,
-        description: 'Operations to apply in order, for example [{"tool":"obsidian_append","args":{"path":"Note","content":"x"}}].',
-        items: {
-          type: 'object',
-          additionalProperties: false,
-          properties: {
-            tool: { type: 'string', required: true },
-            args: { type: 'object', additionalProperties: true, required: true },
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        operations: {
+          type: 'array',
+          required: true,
+          description: 'Operations to apply in order, for example [{"tool":"obsidian_append","args":{"path":"Note","content":"x"}}].',
+          items: {
+            type: 'object',
+            additionalProperties: false,
+            properties: {
+              tool: { type: 'string', required: true },
+              args: { type: 'object', additionalProperties: true, required: true },
+            },
           },
         },
       },
+      required: ['operations'],
     },
     output: {
       schema: {
