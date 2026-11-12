@@ -58,18 +58,22 @@ To pin one vault, add a config block:
 | Tool | What it does |
 |---|---|
 | `obsidian_info` | Absolute vault path, whether it exists, note count. Call this first when unsure which vault is connected. |
-| `obsidian_list` | List notes, optionally limited to a folder or filtered by a glob (`Projects/**`, `*.md`). |
-| `obsidian_read` | Read one note by vault-relative path; `.md` may be omitted. Line numbers match `obsidian_edit`. |
-| `obsidian_search` | Search note titles and bodies, literally or with `regex`. |
-| `obsidian_new` | Create a note with optional frontmatter. Refuses to overwrite an existing note. |
+| `obsidian_list` | List notes, optionally limited to one folder. Returns path, size and modification time. |
+| `obsidian_read` | Read one note by vault-relative path; `.md` may be omitted. |
+| `obsidian_search` | Literal, case-insensitive search; returns each hit as path plus line number. |
+| `obsidian_new` | Create a note with optional body, `tags` (comma-separated) and `properties` (JSON object string). Refuses to overwrite. |
 | `obsidian_append` | Append Markdown to the end of a note, creating it when absent. |
-| `obsidian_edit` | Four modes: `replace` (literal, must be unique unless `replaceAll`), `replaceLines`, `insertLines`, `deleteLines`. |
-| `obsidian_frontmatter` | `get` / `set` / `delete` one frontmatter key without touching the body. |
-| `obsidian_query` | Find notes by frontmatter properties, tags and path; tags are ANDed. |
-| `obsidian_move` | Move or rename a note and, by default, rewrite every wikilink in the vault that points at it. |
-| `obsidian_delete` | Move a note into the vault's `.trash` folder instead of unlinking it. |
-| `obsidian_insert_image` | Copy an image into the vault and reference it from a note. |
-| `obsidian_batch` | Run several of the above as one transaction: if any step fails, earlier steps are rolled back. |
+| `obsidian_edit` | Replace one literal string (unique unless `replaceAll`), or replace lines `fromLine`..`toLine` with `content`. |
+| `obsidian_frontmatter` | `get` / `set` / `delete` one frontmatter key without touching the body or other keys. |
+| `obsidian_query` | Find notes by tag, by a frontmatter key, and/or inside one folder. Tags are ANDed. |
+| `obsidian_move` | Move or rename a note and rewrite the wikilinks pointing at it. Links change only when the file name changes. |
+| `obsidian_delete` | Move a note into the vault's `.trash` folder; `permanent` unlinks instead. |
+| `obsidian_insert_image` | Copy an image into the vault and return the embed snippet, optionally appending it to a note. |
+| `obsidian_batch` | Run several of the above in order from a JSON step list, stopping at the first failure. |
+
+Parameters are deliberately plain: `tags` is a comma-separated string, `properties`
+and `steps` are JSON strings. Arrays and objects are kept out of the schema on
+purpose — see the wire-format note below.
 
 ## Safety behaviour
 
@@ -104,16 +108,32 @@ built to survive that:
 If a future release does change the tool contract, the failure mode is a
 `[dsh-obsidian-vault] ...` line in the log naming what broke, not a dead profile.
 
+## Wire format
+
+Tool schemas are kept to the minimum every provider accepts, which is a
+correctness requirement rather than a style choice:
+
+- `parameters` is `{ type: 'object', properties, required }` and nothing else —
+  no `enum`, no `additionalProperties`, no array- or object-valued properties;
+- no `output` block is declared;
+- descriptions stay short.
+
+A reverse proxy that validates the tool contract more strictly than the harness
+does will reject the **whole request** with HTTP 400 when any tool schema falls
+outside what it accepts. That failure is not scoped to the offending tool: every
+turn fails, including turns that never touch this plugin. The test suite pins
+these rules so a later edit cannot quietly reintroduce the richer schemas.
+
 ## Tests
 
 ```sh
 npm test
 ```
 
-Runs 25 checks against a throwaway vault: tool registration, create/read/edit,
-frontmatter fidelity, CRLF and BOM preservation, wikilink rewriting on move,
-`.trash` deletion, path-escape rejection, and the compatibility behaviour above.
-No network, no Obsidian, no real vault.
+Runs 39 checks against a throwaway vault: wire-format conformance, create/read/
+edit, frontmatter fidelity, CRLF and BOM preservation, wikilink rewriting on move,
+`.trash` deletion, path-escape rejection, and the host-fault behaviour above. No
+network, no Obsidian, no real vault.
 
 ## 中文速览
 
@@ -122,6 +142,11 @@ frontmatter、按标签查询；重命名笔记时自动改写全库双链；删
 写入是原子的，保留 CRLF 与 BOM。插件不导入任何 `@deepseek-ai/*` 包，只调用
 `ctx.tools.register`，因此 Harness 升级不会因依赖版本范围把插件打挂；即使宿主
 接口变动，也只是日志里出现一行提示，不会让 profile 起不来。
+
+工具参数只用最简的 JSON Schema（`type` / `properties` / `required`），不用
+`enum`、`additionalProperties`，参数里不出现数组与对象，也不声明 `output`。
+这不是洁癖：经过会校验工具契约的反向代理时，任何一处越界的关键字都会让**整个
+请求**被 400 拒绝——连带那些根本没用这个插件的对话一起失败。
 
 安装请用 GitHub 路径：
 
